@@ -6,6 +6,7 @@ interface AuthFieldProps {
   name: string
   type?: 'email' | 'password' | 'text'
   autoComplete?: string
+  placeholder?: string
   value: string
   error?: string
   onChange: (value: string) => void
@@ -16,6 +17,7 @@ export function AuthField({
   name,
   type = 'text',
   autoComplete,
+  placeholder,
   value,
   error,
   onChange,
@@ -36,6 +38,7 @@ export function AuthField({
           name={name}
           type={inputType}
           autoComplete={autoComplete}
+          placeholder={placeholder}
           value={value}
           onChange={(event) => onChange(event.currentTarget.value)}
           aria-invalid={Boolean(error)}

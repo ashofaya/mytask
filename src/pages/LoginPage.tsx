@@ -65,6 +65,7 @@ export function LoginPage() {
             name="email"
             type="email"
             autoComplete="email"
+            placeholder="nama@email.com"
             value={email}
             error={fieldErrors.email}
             onChange={setEmail}
@@ -74,13 +75,14 @@ export function LoginPage() {
             name="password"
             type="password"
             autoComplete="current-password"
+            placeholder="Masukkan password"
             value={password}
             error={fieldErrors.password}
             onChange={setPassword}
           />
           <div className="flex justify-end">
             <Link
-              className="text-sm font-medium text-blue-700 hover:text-blue-800"
+              className="rounded-sm text-sm font-medium text-blue-700 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               to="/forgot-password"
             >
               Lupa password?
@@ -92,7 +94,7 @@ export function LoginPage() {
         </form>
         <p className="text-center text-sm text-slate-600">
           Belum punya akun?{' '}
-          <Link className="font-medium text-blue-700 hover:text-blue-800" to="/register">
+          <Link className="rounded-sm font-medium text-blue-700 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" to="/register">
             Daftar
           </Link>
         </p>
