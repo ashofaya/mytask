@@ -6,6 +6,6 @@ describe('application scaffold', () => {
   it('requires authentication before displaying the private home page', async () => {
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: 'Masuk ke MyTask' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Halo, Selamat Datang Kembali!' })).toBeInTheDocument()
   })
 })

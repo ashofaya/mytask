@@ -130,7 +130,7 @@ describe('authentication routes and session state', () => {
     render(<App />)
 
     expect(
-      await screen.findByRole('heading', { name: 'Masuk ke MyTask' }),
+      await screen.findByRole('heading', { name: 'Halo, Selamat Datang Kembali!' }),
     ).toBeInTheDocument()
     expect(screen.queryByText(/akun terhubung/i)).not.toBeInTheDocument()
   })
@@ -310,7 +310,7 @@ describe('authentication routes and session state', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Keluar' }))
 
-    expect(await screen.findByRole('heading', { name: 'Masuk ke MyTask' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Halo, Selamat Datang Kembali!' })).toBeInTheDocument()
     expect(authMocks.signOut).toHaveBeenCalledOnce()
   })
 })

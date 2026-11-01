@@ -47,8 +47,8 @@ export function LoginPage() {
   return (
     <AuthPageLayout
       eyebrow="Selamat datang kembali"
-      title="Masuk ke MyTask"
-      description="Gunakan akun Anda untuk melanjutkan mengelola pekerjaan."
+      title="Halo, Selamat Datang Kembali!"
+      description="Yuk, masuk dulu buat lanjutin ngurusin kerjaanmu hari ini."
     >
       <div className="space-y-4">
         {!supabase && (
