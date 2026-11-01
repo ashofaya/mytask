@@ -92,7 +92,6 @@ function App() {
             >
               <Route index element={<DashboardPage />} />
               <Route path="tasks" element={<TasksPage />} />
-              <Route path="tasks/new" element={<TasksPage />} />
               <Route path="tasks/:taskId" element={<TasksPage />} />
               <Route path="overdue" element={<TasksPage mode="overdue" />} />
               <Route path="completed" element={<TasksPage mode="completed" />} />

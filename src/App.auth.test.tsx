@@ -144,6 +144,15 @@ describe('authentication routes and session state', () => {
     expect(authMocks.from).toHaveBeenCalledWith('profiles')
   })
 
+  it('opens the task form at the new-task route', async () => {
+    setSession(testSession)
+    window.history.replaceState({}, '', '/tasks/new')
+    render(<App />)
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Buat task' })).toBeInTheDocument()
+  })
+
   it('signs in and shows only a generic credential error on failure', async () => {
     const user = userEvent.setup()
     authMocks.signInWithPassword.mockImplementation(async () => {
