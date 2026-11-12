@@ -50,7 +50,7 @@ export function ResetPasswordPage() {
     <AuthPageLayout
       eyebrow="Kata sandi baru"
       title="Atur ulang password"
-      description="Buat password baru untuk melindungi akun MyTask Anda."
+      description="Buat kata sandi baru untuk melindungi akun My Task Anda."
     >
       <div className="space-y-4">
         {!supabase && (

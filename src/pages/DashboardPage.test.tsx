@@ -31,11 +31,15 @@ describe('DashboardPage', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: 'Selamat datang di MyTask' })).toBeInTheDocument()
-    expect(screen.getByText('Total task')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Halo, selamat datang di My Task' })).toBeInTheDocument()
+    expect(screen.getByText('Semua tugas')).toBeInTheDocument()
     expect(screen.getAllByText('0')).toHaveLength(5)
     expect(screen.getByText('Hari ini masih lengang')).toBeInTheDocument()
-    expect(screen.getByText('Belum ada task mendatang')).toBeInTheDocument()
+    expect(screen.getByText('Belum ada tugas mendatang')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Buat tugas' })[0]).toHaveAttribute(
+      'href',
+      '/tasks/new',
+    )
   })
 
   it('shows a loading state instead of an empty state while loading', () => {

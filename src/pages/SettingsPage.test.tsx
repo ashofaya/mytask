@@ -71,5 +71,8 @@ describe('SettingsPage', () => {
     await waitFor(() => expect(mocks.requestPermission).toHaveBeenCalledOnce())
     expect(await screen.findByText(/Izin notifikasi diberikan/)).toBeInTheDocument()
     expect(screen.getByText(/tidak dijadwalkan saat browser ditutup/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Buka Google Calendar' }),
+    ).toHaveAttribute('href', 'https://calendar.google.com/calendar/u/0/r')
   })
 })

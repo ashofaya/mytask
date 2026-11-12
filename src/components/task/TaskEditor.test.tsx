@@ -17,8 +17,8 @@ describe('TaskEditor', () => {
 
     await user.type(screen.getByLabelText('Judul'), '  ')
     await user.type(screen.getByLabelText('Tanggal mulai'), '2026-11-05')
-    await user.type(screen.getByLabelText('Deadline'), '2026-11-01')
-    await user.click(screen.getByRole('button', { name: 'Simpan task' }))
+    await user.type(screen.getByLabelText('Tenggat'), '2026-11-01')
+    await user.click(screen.getByRole('button', { name: 'Simpan tugas' }))
 
     expect(await screen.findByText('Judul wajib diisi.')).toBeInTheDocument()
     expect(
@@ -50,7 +50,7 @@ describe('TaskEditor', () => {
     await user.selectOptions(screen.getByLabelText('Kategori'), '10000000-0000-4000-8000-000000000001')
     await user.selectOptions(screen.getByLabelText('Prioritas'), 'High')
     await user.selectOptions(screen.getByLabelText('Status'), 'In Progress')
-    await user.click(screen.getByRole('button', { name: 'Simpan task' }))
+    await user.click(screen.getByRole('button', { name: 'Simpan tugas' }))
 
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -78,7 +78,7 @@ describe('TaskEditor', () => {
 
     await user.type(screen.getByLabelText('Judul'), 'Historical task')
     await user.type(screen.getByLabelText('Waktu pengingat (WIB)'), '2000-01-01T12:00')
-    await user.click(screen.getByRole('button', { name: 'Simpan task' }))
+    await user.click(screen.getByRole('button', { name: 'Simpan tugas' }))
 
     expect(
       await screen.findByText(/waktu reminder sudah lewat/i),

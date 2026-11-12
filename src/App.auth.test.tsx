@@ -13,6 +13,7 @@ const authMocks = vi.hoisted(() => ({
   resetPasswordForEmail: vi.fn(),
   updateUser: vi.fn(),
   from: vi.fn(),
+  setRememberSession: vi.fn(),
 }))
 const taskMocks = vi.hoisted(() => ({
   useTaskData: vi.fn(),
@@ -23,6 +24,8 @@ vi.mock('./lib/supabase', () => ({
     auth: authMocks,
     from: authMocks.from,
   },
+  getRememberSession: () => true,
+  setRememberSession: authMocks.setRememberSession,
 }))
 vi.mock('./hooks/useTaskData', () => taskMocks)
 
@@ -139,7 +142,7 @@ describe('authentication routes and session state', () => {
     setSession(testSession)
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: 'Selamat datang di MyTask' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Halo, selamat datang di My Task' })).toBeInTheDocument()
     expect(screen.getAllByText('Test User').length).toBeGreaterThan(0)
     expect(authMocks.from).toHaveBeenCalledWith('profiles')
   })
@@ -150,7 +153,7 @@ describe('authentication routes and session state', () => {
     render(<App />)
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Buat task' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Buat tugas' })).toBeInTheDocument()
   })
 
   it('signs in and shows only a generic credential error on failure', async () => {
@@ -176,8 +179,24 @@ describe('authentication routes and session state', () => {
       })
     })
     expect(
-      await screen.findByRole('heading', { name: 'Selamat datang di MyTask' }),
+      await screen.findByRole('heading', { name: 'Halo, selamat datang di My Task' }),
     ).toBeInTheDocument()
+  })
+
+  it('uses the remember-me choice to select session persistence', async () => {
+    const user = userEvent.setup()
+    window.history.replaceState({}, '', '/login')
+    render(<App />)
+
+    await user.type(await screen.findByLabelText('Email'), 'user@example.com')
+    await user.type(screen.getByLabelText('Password'), 'password-123')
+    await user.click(screen.getByRole('checkbox', { name: 'Ingat saya' }))
+    await user.click(screen.getByRole('button', { name: 'Masuk' }))
+
+    await waitFor(() => {
+      expect(authMocks.setRememberSession).toHaveBeenCalledWith(false)
+    })
+    expect(authMocks.signInWithPassword).toHaveBeenCalledOnce()
   })
 
   it('shows a generic login failure for unknown emails or incorrect passwords', async () => {
@@ -276,7 +295,7 @@ describe('authentication routes and session state', () => {
       })
     })
     expect(
-      await screen.findByRole('heading', { name: 'Selamat datang di MyTask' }),
+      await screen.findByRole('heading', { name: 'Halo, selamat datang di My Task' }),
     ).toBeInTheDocument()
   })
 

@@ -8,6 +8,7 @@ import {
   Plus,
   TriangleAlert,
 } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { EmptyState, ErrorState, LoadingState } from '../components/common/DataState'
 import { TaskList } from '../components/task/TaskList'
@@ -27,11 +28,11 @@ export function DashboardPage() {
   }
 
   const stats = [
-    { label: 'Total task', value: summary.total, icon: ListTodo, color: 'bg-blue-50 text-blue-700', to: '/tasks' },
-    { label: 'To Do', value: summary.todo, icon: Circle, color: 'bg-slate-100 text-slate-600', to: '/tasks?status=To%20Do' },
-    { label: 'In Progress', value: summary.inProgress, icon: Clock3, color: 'bg-amber-50 text-amber-700', to: '/tasks?status=In%20Progress' },
-    { label: 'Completed', value: summary.completed, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-700', to: '/completed' },
-    { label: 'Overdue', value: summary.overdue, icon: TriangleAlert, color: 'bg-rose-50 text-rose-700', to: '/overdue' },
+    { label: 'Semua tugas', value: summary.total, icon: ListTodo, color: 'bg-blue-50 text-blue-700', to: '/tasks' },
+    { label: 'Belum dimulai', value: summary.todo, icon: Circle, color: 'bg-slate-100 text-slate-600', to: '/tasks?status=To%20Do' },
+    { label: 'Sedang dikerjakan', value: summary.inProgress, icon: Clock3, color: 'bg-amber-50 text-amber-700', to: '/tasks?status=In%20Progress' },
+    { label: 'Selesai', value: summary.completed, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-700', to: '/completed' },
+    { label: 'Terlambat', value: summary.overdue, icon: TriangleAlert, color: 'bg-rose-50 text-rose-700', to: '/overdue' },
   ]
 
   return (
@@ -40,27 +41,31 @@ export function DashboardPage() {
         <div>
           <p className="text-sm font-medium text-blue-700">Ringkasan pekerjaan</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Selamat datang di MyTask
+            Halo, selamat datang di My Task
           </h1>
           <p className="mt-2 text-sm text-slate-600">
-            Pantau prioritas dan deadline Anda hari ini.
+            Atur prioritas dan tenggat untuk hari ini.
           </p>
         </div>
         <Link
           to="/tasks/new"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          className="hidden h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:inline-flex"
         >
           <Plus aria-hidden="true" className="size-4" />
-          Buat task
+          Buat tugas
         </Link>
       </header>
 
-      <section aria-label="Statistik task" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <section aria-label="Statistik tugas" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {stats.map(({ label, value, icon: Icon, color, to }) => (
           <Link
             key={label}
             to={to}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/[0.02] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+            className={`rounded-2xl border bg-white p-4 shadow-sm shadow-slate-900/[0.02] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 ${
+              label === 'Terlambat' && value > 0
+                ? 'border-rose-200 bg-rose-50/40'
+                : 'border-slate-200'
+            }`}
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm text-slate-600">{label}</span>
@@ -68,29 +73,40 @@ export function DashboardPage() {
                 <Icon aria-hidden="true" className="size-[18px]" />
               </span>
             </div>
-            <p className="mt-4 text-3xl font-semibold tracking-tight">{value}</p>
+            <p className={`mt-4 text-3xl font-semibold tracking-tight ${
+              label === 'Terlambat' && value > 0 ? 'text-rose-700' : ''
+            }`}>{value}</p>
           </Link>
         ))}
       </section>
 
       <TaskSection
         title="Hari ini"
-        description="Task yang deadline-nya hari ini."
+        description="Tugas yang tenggatnya jatuh hari ini."
         icon={Clock3}
         tasks={summary.today}
         emptyTitle="Hari ini masih lengang"
-        emptyDescription="Belum ada task yang jatuh tempo hari ini."
+        emptyDescription="Belum ada tugas yang jatuh tempo hari ini."
+        emptyAction={
+          <Link
+            to="/tasks/new"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          >
+            <Plus aria-hidden="true" className="size-4" />
+            Buat tugas
+          </Link>
+        }
         categories={data.categories}
         onStatusChange={data.changeStatus}
         onDelete={(task) => data.removeTask(task.id)}
       />
       <TaskSection
         title="Mendatang"
-        description="Task dengan deadline dalam tujuh hari ke depan."
+        description="Tugas dengan tenggat dalam tujuh hari ke depan."
         icon={ArrowDownRight}
         tasks={summary.upcoming}
-        emptyTitle="Belum ada task mendatang"
-        emptyDescription="Task dengan deadline H+1 sampai H+7 akan muncul di sini."
+        emptyTitle="Belum ada tugas mendatang"
+        emptyDescription="Tugas dengan tenggat H+1 sampai H+7 akan muncul di sini."
         categories={data.categories}
         onStatusChange={data.changeStatus}
         onDelete={(task) => data.removeTask(task.id)}
@@ -100,9 +116,16 @@ export function DashboardPage() {
           to="/tasks"
           className="inline-flex items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-800"
         >
-          Lihat semua task <ArrowRight aria-hidden="true" className="size-4" />
+          Lihat semua tugas <ArrowRight aria-hidden="true" className="size-4" />
         </Link>
       </div>
+      <Link
+        aria-label="Buat tugas cepat"
+        to="/tasks/new"
+        className="fixed bottom-5 right-5 z-10 inline-flex size-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-900/25 transition hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:hidden"
+      >
+        <Plus aria-hidden="true" className="size-6" />
+      </Link>
     </div>
   )
 }
@@ -114,6 +137,7 @@ function TaskSection({
   tasks,
   emptyTitle,
   emptyDescription,
+  emptyAction,
   categories,
   onStatusChange,
   onDelete,
@@ -124,6 +148,7 @@ function TaskSection({
   tasks: ReturnType<typeof getDashboardSummary>['today']
   emptyTitle: string
   emptyDescription: string
+  emptyAction?: ReactNode
   categories: ReturnType<typeof useTaskData>['categories']
   onStatusChange: ReturnType<typeof useTaskData>['changeStatus']
   onDelete: (task: TaskRecord) => Promise<void>
@@ -147,7 +172,11 @@ function TaskSection({
           onDelete={onDelete}
         />
       ) : (
-        <EmptyState title={emptyTitle} description={emptyDescription} />
+        <EmptyState
+          title={emptyTitle}
+          description={emptyDescription}
+          action={emptyAction}
+        />
       )}
     </section>
   )

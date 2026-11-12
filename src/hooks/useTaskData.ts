@@ -31,6 +31,7 @@ export function useTaskData() {
       ])
       setTasks(nextTasks)
       setCategories(nextCategories)
+      window.dispatchEvent(new Event('mytask:tasks-updated'))
     } catch (loadError) {
       setError(
         loadError instanceof Error
@@ -50,6 +51,7 @@ export function useTaskData() {
           setTasks(nextTasks)
           setCategories(nextCategories)
           setError(null)
+          window.dispatchEvent(new Event('mytask:tasks-updated'))
         }
       })
       .catch((loadError: unknown) => {

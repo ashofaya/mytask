@@ -7,6 +7,7 @@ import { taskSchema, type TaskFormInput } from '../../lib/taskValidation'
 import { formatJakartaDateTimeLocal, isPastJakartaDateTime } from '../../utils/dateTime'
 import { AuthSubmitButton } from '../auth/AuthSubmitButton'
 import { TaskReminderSaveError } from '../../services/taskService'
+import { getTaskPriorityLabel, getTaskStatusLabel } from '../../utils/taskLabels'
 
 const emptyValues: TaskFormInput = {
   title: '',
@@ -112,7 +113,7 @@ export function TaskEditor({
               {task ? 'Perbarui pekerjaan' : 'Task baru'}
             </p>
             <h2 id="task-editor-title" className="mt-1 text-xl font-semibold tracking-tight">
-              {task ? 'Edit task' : 'Buat task'}
+              {task ? 'Edit tugas' : 'Buat tugas'}
             </h2>
           </div>
           <Button type="button" variant="outline" onClick={onCancel}>
@@ -172,7 +173,7 @@ export function TaskEditor({
               onChange={(value) => setField('priority', value as TaskFormInput['priority'])}
               options={TASK_PRIORITIES.map((priority) => ({
                 value: priority,
-                label: priority,
+                label: getTaskPriorityLabel(priority),
               }))}
             />
             <SelectField
@@ -182,7 +183,7 @@ export function TaskEditor({
               onChange={(value) => setField('status', value as TaskFormInput['status'])}
               options={TASK_STATUSES.map((status) => ({
                 value: status,
-                label: status,
+                label: getTaskStatusLabel(status),
               }))}
             />
             <DateField
@@ -194,7 +195,7 @@ export function TaskEditor({
             />
             <DateField
               id="task-deadline"
-              label="Deadline"
+              label="Tenggat"
               value={values.deadline ?? ''}
               error={errors.deadline}
               onChange={(value) => setField('deadline', value)}
@@ -213,7 +214,7 @@ export function TaskEditor({
               Batal
             </Button>
             <AuthSubmitButton loading={submitting}>
-              {task ? 'Simpan perubahan' : 'Simpan task'}
+              {task ? 'Simpan perubahan' : 'Simpan tugas'}
             </AuthSubmitButton>
           </div>
         </form>

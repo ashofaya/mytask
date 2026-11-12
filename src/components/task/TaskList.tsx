@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { CalendarPlus, Pencil, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { formatDateJakarta } from '../../utils/dateTime'
+import { buildGoogleCalendarEventUrl } from '../../utils/googleCalendar'
 import { TASK_STATUSES, type Category, type TaskRecord, type TaskStatus } from '../../types/database'
 import { Button } from '../ui/button'
+import { getTaskPriorityLabel, getTaskStatusLabel } from '../../utils/taskLabels'
 
 export function TaskList({
   tasks,
@@ -64,7 +66,7 @@ export function TaskList({
       )}
       {!tasks.length ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-          Belum ada task pada bagian ini.
+          Belum ada tugas pada bagian ini.
         </div>
       ) : (
         tasks.map((task) => (
@@ -87,7 +89,7 @@ export function TaskList({
                 )}
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                   {task.deadline && (
-                    <span>Deadline {formatDateJakarta(task.deadline)}</span>
+                    <span>Tenggat {formatDateJakarta(task.deadline)}</span>
                   )}
                   {task.category_id && (
                     <span>Kategori: {categoryNames.get(task.category_id) ?? 'Kategori'}</span>
@@ -118,10 +120,24 @@ export function TaskList({
                 >
                   {TASK_STATUSES.map((status) => (
                     <option key={status} value={status}>
-                      {status}
+                      {getTaskStatusLabel(status)}
                     </option>
                   ))}
                 </select>
+                <a
+                  href={buildGoogleCalendarEventUrl(
+                    task,
+                    task.category_id ? categoryNames.get(task.category_id) : undefined,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Tambah ${task.title} ke Google Calendar`}
+                  title="Tambah ke Google Calendar"
+                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+                >
+                  <CalendarPlus aria-hidden="true" className="size-3.5 text-blue-600" />
+                  <span className="hidden sm:inline">Google Calendar</span>
+                </a>
                 {onEdit ? (
                   <Button
                     variant="outline"
@@ -199,7 +215,7 @@ function PriorityBadge({ priority }: { priority: TaskRecord['priority'] }) {
 
   return (
     <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${style}`}>
-      {priority}
+      {getTaskPriorityLabel(priority)}
     </span>
   )
 }

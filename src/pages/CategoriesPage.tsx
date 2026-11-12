@@ -110,7 +110,7 @@ export function CategoriesPage() {
         <p className="text-sm font-medium text-blue-700">Organisasi</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Kategori</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Gunakan kategori untuk mengelompokkan task pribadi Anda.
+          Gunakan kategori untuk mengelompokkan tugas pribadi Anda.
         </p>
       </header>
 

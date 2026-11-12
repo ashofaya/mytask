@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react'
-import { ArrowLeft, ArrowRight, CalendarDays, CalendarRange } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CalendarDays, CalendarPlus, CalendarRange, Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { EmptyState, ErrorState, LoadingState } from '../components/common/DataState'
 import { Button } from '../components/ui/button'
 import { useTaskData } from '../hooks/useTaskData'
 import { formatDateJakarta, todayJakarta } from '../utils/dateTime'
 import { getMonthDates, getWeekDates, shiftCalendarPeriod } from '../utils/calendar'
+import { buildGoogleCalendarEventUrl, downloadTasksIcs } from '../utils/googleCalendar'
 import { isOverdue } from '../utils/taskLogic'
 import type { TaskRecord } from '../types/database'
+import { getTaskStatusLabel } from '../utils/taskLabels'
 
 type CalendarView = 'month' | 'week'
 
@@ -22,8 +24,8 @@ function monthLabel(value: string): string {
 }
 
 function taskState(task: Pick<TaskRecord, 'deadline' | 'status'>, today: string) {
-  if (task.status === 'Completed') return 'Selesai'
-  return isOverdue(task, today) ? 'Overdue' : task.status
+  if (isOverdue(task, today)) return 'Terlambat'
+  return getTaskStatusLabel(task.status)
 }
 
 export function CalendarPage() {
@@ -50,6 +52,14 @@ export function CalendarPage() {
     if (right.status === 'Completed' && left.status !== 'Completed') return -1
     return left.title.localeCompare(right.title)
   })
+  const categoryNames = useMemo(
+    () => new Map((data.categories ?? []).map((cat) => [cat.id, cat.name])),
+    [data.categories],
+  )
+  const exportableTasks = useMemo(
+    () => data.tasks.filter((task) => Boolean(task.deadline || task.start_date)),
+    [data.tasks],
+  )
 
   if (data.loading) return <LoadingState label="Memuat kalender…" />
   if (data.error) return <ErrorState message={data.error} onRetry={() => void data.reload()} />
@@ -65,10 +75,18 @@ export function CalendarPage() {
           <p className="text-sm font-medium text-blue-700">Rencanakan pekerjaan</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Kalender</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Deadline ditampilkan menurut tanggal kalender Asia/Jakarta.
+            Tenggat ditampilkan menurut tanggal kalender Asia/Jakarta dan dapat diekspor ke Google Calendar.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            disabled={exportableTasks.length === 0}
+            onClick={() => downloadTasksIcs(exportableTasks, categoryNames)}
+          >
+            <Download aria-hidden="true" className="mr-2 size-4" />
+            Ekspor .ics Google Calendar
+          </Button>
           <Button variant="outline" onClick={() => setSelectedDate(today)}>Hari ini</Button>
           <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1">
             <Button
@@ -150,7 +168,7 @@ export function CalendarPage() {
                         className={`block truncate rounded px-1 py-0.5 text-left text-[10px] leading-4 sm:px-1.5 sm:text-xs ${
                           state === 'Selesai'
                             ? 'bg-emerald-50 text-emerald-800 line-through'
-                            : state === 'Overdue'
+                            : state === 'Terlambat'
                               ? 'bg-rose-50 text-rose-800'
                               : 'bg-blue-50 text-blue-800'
                         }`}
@@ -188,10 +206,10 @@ export function CalendarPage() {
             {selectedTasks.map((task) => {
               const state = taskState(task, today)
               return (
-                <li key={task.id}>
+                <li key={task.id} className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3">
                   <Link
                     to={`/tasks/${task.id}`}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-blue-200 hover:bg-blue-50/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+                    className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-lg transition hover:text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
                   >
                     <span className={`min-w-0 truncate text-sm font-medium ${state === 'Selesai' ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
                       {task.title}
@@ -199,13 +217,27 @@ export function CalendarPage() {
                     <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
                       state === 'Selesai'
                         ? 'bg-emerald-50 text-emerald-700'
-                        : state === 'Overdue'
+                        : state === 'Terlambat'
                           ? 'bg-rose-50 text-rose-700'
                           : 'bg-blue-50 text-blue-700'
                     }`}>
                       {state}
                     </span>
                   </Link>
+                  <a
+                    href={buildGoogleCalendarEventUrl(
+                      task,
+                      task.category_id ? categoryNames.get(task.category_id) : undefined,
+                      selectedDate,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Tambah ${task.title} ke Google Calendar`}
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-xs font-medium text-blue-700 transition hover:bg-blue-50"
+                  >
+                    <CalendarPlus aria-hidden="true" className="size-3.5" />
+                    <span className="hidden sm:inline">Google Calendar</span>
+                  </a>
                 </li>
               )
             })}
@@ -214,7 +246,7 @@ export function CalendarPage() {
           <EmptyState
             title="Tidak ada task pada tanggal ini"
             description="Task yang memiliki deadline pada tanggal ini akan muncul di sini."
-            action={<Link className="text-sm font-medium text-blue-700" to="/tasks/new">Buat task</Link>}
+            action={<Link className="text-sm font-medium text-blue-700" to="/tasks/new">Buat tugas</Link>}
           />
         )}
       </section>

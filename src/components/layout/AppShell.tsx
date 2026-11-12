@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   CheckCircle2,
   ClipboardCheck,
   CalendarDays,
+  FolderKanban,
   LayoutDashboard,
   ListTodo,
   LogOut,
@@ -15,22 +16,30 @@ import {
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { Button } from '../ui/button'
 import { useAuth } from '../../hooks/useAuth'
+import { countOverdueTasks } from '../../services/taskService'
 import { useReminderScheduler } from '../../hooks/useReminderScheduler'
 import { useRecurringBootstrap } from '../../hooks/useRecurringBootstrap'
 import { LoadingState } from '../common/DataState'
+import { ThemeToggleButton } from '../theme/ThemeToggleButton'
 
 const navigation = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/tasks', label: 'Semua task', icon: ListTodo },
-  { to: '/overdue', label: 'Overdue', icon: TriangleAlert },
-  { to: '/completed', label: 'Completed', icon: CheckCircle2 },
+  { to: '/', label: 'Ringkasan', icon: LayoutDashboard, end: true },
+  { to: '/tasks', label: 'Semua tugas', icon: ListTodo },
+  { to: '/overdue', label: 'Terlambat', icon: TriangleAlert },
+  { to: '/completed', label: 'Selesai', icon: CheckCircle2 },
   { to: '/calendar', label: 'Kalender', icon: CalendarDays },
-  { to: '/categories', label: 'Kategori', icon: ClipboardCheck },
-  { to: '/recurring', label: 'Task berulang', icon: Repeat2 },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/categories', label: 'Kategori', icon: FolderKanban },
+  { to: '/recurring', label: 'Tugas berulang', icon: Repeat2 },
+  { to: '/settings', label: 'Pengaturan', icon: Settings },
 ]
 
-function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavigationLinks({
+  onNavigate,
+  overdueCount,
+}: {
+  onNavigate?: () => void
+  overdueCount: number
+}) {
   return (
     <nav aria-label="Navigasi utama" className="space-y-1">
       {navigation.map(({ to, label, icon: Icon, end }) => (
@@ -48,7 +57,12 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
           }
         >
           <Icon aria-hidden="true" className="size-[18px]" />
-          {label}
+          <span className="flex-1">{label}</span>
+          {to === '/overdue' && overdueCount > 0 && (
+            <span className="min-w-5 rounded-full bg-rose-100 px-1.5 py-0.5 text-center text-xs font-semibold text-rose-800 dark:bg-rose-900/60 dark:text-rose-100">
+              {overdueCount}
+            </span>
+          )}
         </NavLink>
       ))}
     </nav>
@@ -62,6 +76,33 @@ export function AppShell() {
   const recurring = useRecurringBootstrap()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [signOutError, setSignOutError] = useState<string | null>(null)
+  const [overdueCount, setOverdueCount] = useState(0)
+  const [overdueCountError, setOverdueCountError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    const refreshOverdueCount = () => {
+      void countOverdueTasks()
+        .then((count) => {
+          if (active) {
+            setOverdueCount(count)
+            setOverdueCountError(null)
+          }
+        })
+        .catch(() => {
+          if (active) {
+            setOverdueCountError('Jumlah tugas terlambat belum dapat dimuat.')
+          }
+        })
+    }
+
+    refreshOverdueCount()
+    window.addEventListener('mytask:tasks-updated', refreshOverdueCount)
+    return () => {
+      active = false
+      window.removeEventListener('mytask:tasks-updated', refreshOverdueCount)
+    }
+  }, [])
 
   async function handleSignOut() {
     setSignOutError(null)
@@ -74,17 +115,26 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950">
+    <div className="min-h-screen bg-slate-50 text-slate-950 transition-colors">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r border-slate-200 bg-white px-4 py-6 lg:block">
         <Brand />
         <div className="mt-10">
-          <NavigationLinks />
+          <NavigationLinks overdueCount={overdueCount} />
         </div>
         <div className="absolute inset-x-4 bottom-5 rounded-xl bg-slate-50 p-3">
           <p className="truncate text-sm font-medium text-slate-800">
             {profile?.display_name || user?.email}
           </p>
-          <p className="mt-0.5 text-xs text-slate-500">Akun pribadi</p>
+          <p className="mt-0.5 text-xs text-slate-600">Akun pribadi</p>
+          <button
+            type="button"
+            aria-label="Keluar dari akun"
+            className="mt-3 inline-flex items-center gap-2 rounded-md text-sm font-medium text-slate-700 hover:text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            onClick={() => void handleSignOut()}
+          >
+            <LogOut aria-hidden="true" className="size-4" />
+            Keluar
+          </button>
         </div>
       </aside>
 
@@ -104,17 +154,20 @@ export function AppShell() {
               <Brand compact />
             </div>
             <span className="hidden text-sm text-slate-500 lg:inline">
-              Selamat datang, {profile?.display_name || user?.email}
+              Halo, {profile?.display_name || user?.email}
             </span>
           </div>
-          <Button
-            variant="ghost"
-            className="gap-2 text-slate-600"
-            onClick={() => void handleSignOut()}
-          >
-            <LogOut aria-hidden="true" className="size-4" />
-            <span className="hidden sm:inline">Keluar</span>
-          </Button>
+          <div className="flex items-center gap-1">
+            <ThemeToggleButton />
+            <Button
+              variant="ghost"
+              className="gap-2 text-slate-600 lg:hidden"
+              onClick={() => void handleSignOut()}
+            >
+              <LogOut aria-hidden="true" className="size-4" />
+              <span className="hidden sm:inline">Keluar</span>
+            </Button>
+          </div>
         </header>
 
         {mobileMenuOpen && (
@@ -131,12 +184,20 @@ export function AppShell() {
                   <X />
                 </Button>
               </div>
-              <NavigationLinks onNavigate={() => setMobileMenuOpen(false)} />
+              <NavigationLinks
+                onNavigate={() => setMobileMenuOpen(false)}
+                overdueCount={overdueCount}
+              />
             </div>
           </div>
         )}
 
         <main className="mx-auto max-w-7xl px-4 py-7 sm:px-7 sm:py-9">
+          {overdueCountError && (
+            <p role="status" className="mb-4 text-sm text-amber-800 dark:text-amber-200">
+              {overdueCountError}
+            </p>
+          )}
           {recurring.error && (
             <div role="alert" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
               {recurring.error}
@@ -171,8 +232,8 @@ function Brand({ compact = false }: { compact?: boolean }) {
       </span>
       {!compact && (
         <span>
-          <span className="block font-semibold tracking-tight">MyTask</span>
-          <span className="block text-xs text-slate-500">Personal Task Manager</span>
+          <span className="block font-semibold tracking-tight">My Task</span>
+          <span className="block text-xs text-slate-500">Pengelola tugas pribadi</span>
         </span>
       )}
     </div>

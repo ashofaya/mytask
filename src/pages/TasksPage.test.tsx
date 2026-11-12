@@ -65,7 +65,7 @@ describe('TasksPage', () => {
     expect(screen.getByText('Prepare release')).toBeInTheDocument()
     await user.type(screen.getByRole('searchbox', { name: 'Cari task' }), 'not found')
     expect(screen.queryByText('Prepare release')).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Belum ada task' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Belum ada tugas' })).toBeInTheDocument()
   })
 
   it('opens edit form for a task route and saves through the hook service', async () => {

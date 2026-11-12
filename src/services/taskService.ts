@@ -7,6 +7,7 @@ import type {
 import {
   isPastJakartaDateTime,
   jakartaDateTimeLocalToIso,
+  todayJakarta,
 } from '../utils/dateTime'
 
 export interface SaveTaskInput extends TaskInsert {
@@ -122,6 +123,22 @@ export async function listTasks(): Promise<TaskRecord[]> {
     ...task,
     remind_at: reminderByTask.get(task.id) ?? null,
   }))
+}
+
+export async function countOverdueTasks(): Promise<number> {
+  const { count, error } = await getClient()
+    .from('tasks')
+    .select('id', { count: 'exact', head: true })
+    .lt('deadline', todayJakarta())
+    .neq('status', 'Completed')
+
+  if (error) {
+    throw error
+  }
+  if (count === null) {
+    throw new Error('Jumlah task terlambat tidak dapat dihitung.')
+  }
+  return count
 }
 
 export async function createTask(input: SaveTaskInput): Promise<TaskRecord> {

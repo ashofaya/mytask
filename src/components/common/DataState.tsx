@@ -22,8 +22,8 @@ export function EmptyState({
 }) {
   return (
     <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-      <span className="mx-auto grid size-11 place-items-center rounded-xl bg-slate-100 text-slate-500">
-        <Inbox aria-hidden="true" className="size-5" />
+      <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-slate-100 text-slate-500">
+        <Inbox aria-hidden="true" className="size-7" />
       </span>
       <h3 className="mt-4 font-semibold text-slate-900">{title}</h3>
       <p className="mx-auto mt-1 max-w-md text-sm leading-6 text-slate-500">{description}</p>

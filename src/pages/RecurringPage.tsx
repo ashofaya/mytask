@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { CalendarPlus, Pencil, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { AuthFeedback } from '../components/auth/AuthFeedback'
 import { EmptyState, ErrorState, LoadingState } from '../components/common/DataState'
@@ -21,7 +21,9 @@ import {
   type RecurringRuleUpdate,
 } from '../types/database'
 import { formatDateJakarta, todayJakarta } from '../utils/dateTime'
+import { buildGoogleCalendarRecurringUrl } from '../utils/googleCalendar'
 import { getNextOccurrenceDate } from '../utils/recurringLogic'
+import { getTaskPriorityLabel } from '../utils/taskLabels'
 
 const blankRule = (): RecurringRuleFormInput => ({
   title: '',
@@ -235,9 +237,9 @@ export function RecurringPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <header>
         <p className="text-sm font-medium text-blue-700">Otomatisasi rutinitas</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Task berulang</h1>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Tugas berulang</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Occurrence berikutnya dibuat secara transaksional saat aplikasi aktif. Task overdue tetap disimpan dan tidak menghentikan jadwal.
+          Tugas berikutnya dibuat secara aman saat aplikasi aktif. Tugas terlambat tetap disimpan dan tidak menghentikan jadwal.
         </p>
       </header>
 
@@ -245,7 +247,7 @@ export function RecurringPage() {
         <h2 className="font-semibold">{editing ? 'Edit aturan' : 'Aturan baru'}</h2>
         <form className="mt-4 grid gap-4 sm:grid-cols-2" onSubmit={(event) => void handleSubmit(event)}>
           <label className="space-y-1.5 sm:col-span-2">
-            <span className="text-sm font-medium">Judul task</span>
+            <span className="text-sm font-medium">Judul tugas</span>
             <input
               value={values.title}
               maxLength={255}
@@ -280,7 +282,10 @@ export function RecurringPage() {
             label="Prioritas"
             value={values.priority}
             onChange={(value) => setValues((current) => ({ ...current, priority: value as RecurringRuleFormInput['priority'] }))}
-            options={TASK_PRIORITIES.map((value) => ({ value, label: value }))}
+            options={TASK_PRIORITIES.map((value) => ({
+              value,
+              label: getTaskPriorityLabel(value),
+            }))}
           />
           <DateField
             label="Tanggal mulai"
@@ -303,7 +308,7 @@ export function RecurringPage() {
             ]}
           />
           <label className="space-y-1.5">
-            <span className="text-sm font-medium">Reminder sebelum akhir deadline (menit)</span>
+            <span className="text-sm font-medium">Pengingat sebelum tenggat (menit)</span>
             <input
               type="number"
               min={0}
@@ -373,7 +378,17 @@ export function RecurringPage() {
                           : 'Jadwal telah mencapai tanggal akhir.'}
                     </p>
                   </div>
-                  <div className="flex shrink-0 flex-wrap gap-2">
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    <a
+                      href={buildGoogleCalendarRecurringUrl(rule)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Tambah aturan ${rule.title} ke Google Calendar`}
+                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+                    >
+                      <CalendarPlus aria-hidden="true" className="size-3.5 text-blue-600" />
+                      Google Calendar
+                    </a>
                     <Button variant="outline" onClick={() => void handleActiveChange(rule)}>
                       {rule.is_active ? 'Nonaktifkan' : 'Aktifkan'}
                     </Button>
@@ -390,7 +405,7 @@ export function RecurringPage() {
           })}
         </ul>
       ) : (
-        <EmptyState title="Belum ada task berulang" description="Buat aturan untuk menghasilkan task rutin berikutnya secara otomatis." />
+        <EmptyState title="Belum ada tugas berulang" description="Buat aturan untuk menghasilkan tugas rutin berikutnya secara otomatis." />
       )}
     </div>
   )

@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createTask, listTasks, TaskReminderSaveError, updateTaskStatus } from './taskService'
+import { addDaysToDateOnly, todayJakarta } from '../utils/dateTime'
+import {
+  countOverdueTasks,
+  createTask,
+  listTasks,
+  TaskReminderSaveError,
+  updateTaskStatus,
+} from './taskService'
 
 const mocks = vi.hoisted(() => ({
   from: vi.fn(),
@@ -70,6 +77,24 @@ describe('task service', () => {
     expect(reminderQuery.in).toHaveBeenCalledWith('task_id', ['task-1'])
   })
 
+  it('counts only unfinished tasks with a deadline before Jakarta today', async () => {
+    const query = {
+      select: vi.fn(),
+      lt: vi.fn(),
+      neq: vi.fn(),
+    }
+    query.select.mockReturnValue(query)
+    query.lt.mockReturnValue(query)
+    query.neq.mockResolvedValue({ count: 2, error: null })
+    mocks.from.mockReturnValue(query)
+
+    await expect(countOverdueTasks()).resolves.toBe(2)
+    expect(mocks.from).toHaveBeenCalledWith('tasks')
+    expect(query.select).toHaveBeenCalledWith('id', { count: 'exact', head: true })
+    expect(query.lt).toHaveBeenCalledWith('deadline', expect.any(String))
+    expect(query.neq).toHaveBeenCalledWith('status', 'Completed')
+  })
+
   it('uses the authenticated user id on inserts and reports partial reminder failure', async () => {
     const insert = vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
@@ -88,7 +113,7 @@ describe('task service', () => {
         title: 'Review plan',
         priority: 'Medium',
         status: 'To Do',
-        remind_at: '2026-11-02T12:00',
+        remind_at: `${addDaysToDateOnly(todayJakarta(), 1)}T12:00`,
       }),
     ).rejects.toBeInstanceOf(TaskReminderSaveError)
     expect(insert).toHaveBeenCalledWith(

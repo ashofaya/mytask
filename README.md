@@ -106,7 +106,9 @@ Jangan deploy, link CLI, mengubah konfigurasi Supabase hosted, atau menjalankan 
 
 ## Fitur produktivitas
 
-Setelah login, aplikasi menyediakan Dashboard, task CRUD, kategori, halaman Overdue/Completed, Kalender bulanan dan mingguan, pengelolaan task berulang, serta Settings untuk nama tampilan, password melalui Supabase Auth, timezone `Asia/Jakarta`, dan preferensi notifikasi.
+Setelah login, aplikasi menyediakan Dashboard, task CRUD, kategori, halaman Overdue/Completed, Kalender bulanan dan mingguan, pengelolaan task berulang, integrasi Google Calendar, serta Settings untuk nama tampilan, password melalui Supabase Auth, timezone `Asia/Jakarta`, dan preferensi notifikasi.
+
+- **Integrasi Google Calendar:** Setiap tugas dan aturan berulang memiliki tombol **Google Calendar** yang membuka template event Google Calendar (`Asia/Jakarta`, termasuk dukungan `RRULE` untuk tugas berulang). Halaman Kalender juga menyediakan tombol **Ekspor .ics Google Calendar** untuk mengunduh berkas `.ics` standar RFC 5545 dari seluruh tugas bertenggat agar dapat diimpor sekaligus ke Google Calendar.
 
 Generator recurring memanggil function database transaksional yang sudah ada. Occurrence dijaga idempotent oleh lock dan unique key; task overdue tetap tersimpan dan tidak menghentikan jadwal berikutnya. Reminder browser diperiksa kira-kira setiap 60 detik selama aplikasi aktif dan preferensi serta izin notifikasi aktif. Notifikasi diklaim secara atomik di database sebelum ditampilkan, sehingga tab lain tidak mengirim reminder yang sama.
 

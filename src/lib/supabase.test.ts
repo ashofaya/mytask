@@ -1,10 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { validateEnvironment } from './env'
-import { createSupabaseClient } from './supabase'
+import {
+  createSupabaseClient,
+  getRememberSession,
+  setRememberSession,
+} from './supabase'
 
 describe('createSupabaseClient', () => {
   afterEach(() => {
     vi.unstubAllEnvs()
+    localStorage.clear()
   })
 
   it('creates a client using valid public Supabase configuration', () => {
@@ -30,5 +35,16 @@ describe('createSupabaseClient', () => {
     vi.stubEnv('VITE_SUPABASE_URL', '')
     vi.stubEnv('VITE_SUPABASE_ANON_KEY', '')
     expect(createSupabaseClient()).toBeNull()
+  })
+
+  it('stores the remember-session choice without storing credentials there', () => {
+    localStorage.clear()
+
+    expect(getRememberSession()).toBe(true)
+    setRememberSession(false)
+    expect(getRememberSession()).toBe(false)
+    setRememberSession(true)
+    expect(getRememberSession()).toBe(true)
+    expect(localStorage.getItem('mytask:remember-session')).toBe('true')
   })
 })

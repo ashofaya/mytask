@@ -63,7 +63,7 @@ export function RegisterPage() {
   return (
     <AuthPageLayout
       eyebrow="Mulai lebih teratur"
-      title="Buat akun MyTask"
+      title="Buat akun My Task"
       description="Akun pribadi untuk menyimpan pekerjaan dan deadline Anda."
     >
       <div className="space-y-4">

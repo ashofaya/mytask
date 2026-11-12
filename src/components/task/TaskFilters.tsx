@@ -3,6 +3,7 @@ import {
   TASK_STATUSES,
   type Category,
 } from '../../types/database'
+import { getTaskStatusLabel, getTaskPriorityLabel } from '../../utils/taskLabels'
 import type { TaskFilterValues } from './taskFilterLogic'
 
 export function TaskFilters({
@@ -25,7 +26,7 @@ export function TaskFilters({
           type="search"
           value={value.query}
           onChange={(event) => onChange({ ...value, query: event.currentTarget.value })}
-          placeholder="Cari task…"
+          placeholder="Cari tugas…"
           className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
@@ -36,7 +37,10 @@ export function TaskFilters({
         onChange={(next) =>
           onChange({ ...value, status: next as TaskFilterValues['status'] })
         }
-        options={TASK_STATUSES.map((status) => ({ value: status, label: status }))}
+        options={TASK_STATUSES.map((status) => ({
+          value: status,
+          label: getTaskStatusLabel(status),
+        }))}
       />
       <FilterSelect
         id="filter-task-category"
@@ -57,7 +61,7 @@ export function TaskFilters({
         }
         options={TASK_PRIORITIES.map((priority) => ({
           value: priority,
-          label: priority,
+          label: getTaskPriorityLabel(priority),
         }))}
       />
     </div>

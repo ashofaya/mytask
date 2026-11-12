@@ -7,13 +7,14 @@ import { AuthSubmitButton } from '../components/auth/AuthSubmitButton'
 import { useAuth } from '../hooks/useAuth'
 import { loginSchema } from '../lib/authValidation'
 import { signInWithEmail } from '../services/authService'
-import { supabase } from '../lib/supabase'
+import { getRememberSession, supabase } from '../lib/supabase'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const { error: sessionError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberSession, setRememberSession] = useState(getRememberSession)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -35,7 +36,11 @@ export function LoginPage() {
     setFieldErrors({})
     setSubmitting(true)
     try {
-      await signInWithEmail(result.data.email, result.data.password)
+      await signInWithEmail(
+        result.data.email,
+        result.data.password,
+        rememberSession,
+      )
       navigate('/', { replace: true })
     } catch {
       setSubmitError('Email atau password tidak sesuai. Periksa kembali lalu coba lagi.')
@@ -49,6 +54,7 @@ export function LoginPage() {
       eyebrow="Selamat datang kembali"
       title="Halo, Selamat Datang Kembali!"
       description="Yuk, masuk dulu buat lanjutin ngurusin kerjaanmu hari ini."
+      showThemeToggle
     >
       <div className="space-y-4">
         {!supabase && (
@@ -80,7 +86,20 @@ export function LoginPage() {
             error={fieldErrors.password}
             onChange={setPassword}
           />
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between gap-3">
+            <label
+              htmlFor="remember-session"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-700"
+            >
+              <input
+                id="remember-session"
+                type="checkbox"
+                checked={rememberSession}
+                onChange={(event) => setRememberSession(event.currentTarget.checked)}
+                className="size-4 rounded border-slate-300 accent-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              />
+              Ingat saya
+            </label>
             <Link
               className="rounded-sm text-sm font-medium text-blue-700 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               to="/forgot-password"

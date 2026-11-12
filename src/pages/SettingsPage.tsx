@@ -102,7 +102,7 @@ export function SettingsPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <header>
         <p className="text-sm font-medium text-blue-700">Preferensi akun</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Settings</h1>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Pengaturan</h1>
         <p className="mt-2 text-sm text-slate-600">Kelola profil, zona waktu, dan notifikasi browser.</p>
       </header>
 
@@ -118,9 +118,9 @@ export function SettingsPage() {
             <input id="settings-display-name" name="display_name" defaultValue={profile.display_name} maxLength={100} className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10" />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="settings-timezone" className="text-sm font-medium">Timezone</label>
+            <label htmlFor="settings-timezone" className="text-sm font-medium">Zona waktu</label>
             <input id="settings-timezone" readOnly value={profile.timezone} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-600" />
-            <p className="text-xs text-slate-500">Timezone bisnis MyTask tetap Asia/Jakarta pada versi MVP.</p>
+            <p className="text-xs text-slate-500">Zona waktu My Task tetap Asia/Jakarta pada versi MVP.</p>
           </div>
           <label className="flex items-start gap-3 rounded-xl border border-slate-200 p-3">
             <input type="checkbox" name="notifications_enabled" defaultChecked={profile.notifications_enabled} className="mt-0.5 size-4 accent-blue-600" />
@@ -156,8 +156,41 @@ export function SettingsPage() {
           {permissionFeedback && <p role="status" className="text-sm text-slate-600">{permissionFeedback}</p>}
         </div>
         <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">
-          MyTask memeriksa reminder kira-kira setiap 60 detik selama aplikasi aktif dan izin diberikan. Browser dapat menunda timer; notifikasi tidak dijadwalkan saat browser ditutup dan tidak dijamin ketika tab ditangguhkan.
+          My Task memeriksa pengingat kira-kira setiap 60 detik selama aplikasi aktif dan izin diberikan. Browser dapat menunda timer; notifikasi tidak dijadwalkan saat browser ditutup dan tidak dijamin ketika tab ditangguhkan.
         </p>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+        <h2 className="font-semibold">Integrasi Google Calendar</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Hubungkan daftar tugas dan jadwal berulang MyTask langsung ke Google Calendar Anda:
+        </p>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-600">
+          <li>
+            Gunakan tombol <strong>Google Calendar</strong> pada setiap kartu tugas, halaman Kalender, atau halaman Tugas Berulang untuk membuka jadwal yang sudah terisi otomatis di Google Calendar.
+          </li>
+          <li>
+            Gunakan tombol <strong>Ekspor .ics Google Calendar</strong> di halaman <Link to="/calendar" className="font-medium text-blue-700 hover:underline">Kalender</Link> untuk mengunduh seluruh tugas bertenggat lalu impor sekaligus ke Google Calendar.
+          </li>
+        </ul>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <a
+            href="https://calendar.google.com/calendar/u/0/r"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
+          >
+            Buka Google Calendar
+          </a>
+          <a
+            href="https://calendar.google.com/calendar/u/0/r/settings/export"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            Halaman Impor .ics Google Calendar
+          </a>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
@@ -174,7 +207,7 @@ export function SettingsPage() {
               onChange={(event) => setNewPassword(event.currentTarget.value)}
               className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
             />
-            <p className="text-xs text-slate-500">Password dikelola Supabase Auth; MyTask tidak menyimpannya sendiri.</p>
+            <p className="text-xs text-slate-500">Kata sandi dikelola Supabase Auth; My Task tidak menyimpannya sendiri.</p>
           </div>
           {passwordError && <AuthFeedback>{passwordError}</AuthFeedback>}
           {passwordFeedback && <AuthFeedback variant="success">{passwordFeedback}</AuthFeedback>}

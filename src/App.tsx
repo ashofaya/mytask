@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './hooks/AuthProvider'
+import { ThemeProvider } from './components/theme/ThemeProvider'
 import { ProtectedRoute, PublicOnlyRoute } from './components/auth/ProtectedRoute'
 import { LoadingState } from './components/common/DataState'
 
@@ -59,9 +60,10 @@ const TasksPage = lazy(() =>
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Suspense fallback={<LoadingState label="Memuat MyTask…" />}>
-          <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <Suspense fallback={<LoadingState label="Memuat My Task…" />}>
+            <Routes>
             <Route
               path="/login"
               element={
@@ -102,9 +104,10 @@ function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+            </Routes>
+          </Suspense>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }

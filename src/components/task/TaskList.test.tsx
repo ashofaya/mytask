@@ -43,6 +43,13 @@ describe('TaskList', () => {
     await user.selectOptions(screen.getByLabelText('Status Prepare launch'), 'Completed')
     expect(onStatusChange).toHaveBeenCalledWith('task-1', 'Completed')
 
+    expect(
+      screen.getByRole('link', { name: 'Tambah Prepare launch ke Google Calendar' }),
+    ).toHaveAttribute(
+      'href',
+      expect.stringContaining('https://calendar.google.com/calendar/render?action=TEMPLATE'),
+    )
+
     await user.click(screen.getByRole('button', { name: 'Hapus Prepare launch' }))
     expect(screen.getByRole('alertdialog')).toBeInTheDocument()
     expect(onDelete).not.toHaveBeenCalled()

@@ -45,7 +45,7 @@ describe('RecurringPage', () => {
     const user = userEvent.setup()
     render(<MemoryRouter><RecurringPage /></MemoryRouter>)
 
-    await user.type(await screen.findByLabelText('Judul task'), 'Water plants')
+    await user.type(await screen.findByLabelText('Judul tugas'), 'Water plants')
     await user.selectOptions(screen.getByLabelText('Frekuensi'), 'weekly')
     fireEvent.change(screen.getByLabelText('Tanggal mulai'), {
       target: { value: '2026-11-02' },

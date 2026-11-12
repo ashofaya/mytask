@@ -67,7 +67,7 @@ export function TasksPage({
   }, [data.tasks, filters, mode])
 
   const title =
-    mode === 'overdue' ? 'Task overdue' : mode === 'completed' ? 'Riwayat selesai' : 'Semua task'
+    mode === 'overdue' ? 'Tugas terlambat' : mode === 'completed' ? 'Riwayat selesai' : 'Semua tugas'
 
   async function saveTask(values: Parameters<typeof data.addTask>[0]) {
     setMutationError(null)
@@ -79,21 +79,21 @@ export function TasksPage({
       }
       navigate(mode === 'all' ? '/tasks' : `/${mode}`, {
         replace: true,
-        state: { success: task ? 'Task berhasil diperbarui.' : 'Task berhasil dibuat.' },
+        state: { success: task ? 'Tugas berhasil diperbarui.' : 'Tugas berhasil dibuat.' },
       })
     } catch (error) {
       if (error instanceof TaskReminderSaveError) {
         await data.reload()
       }
       setMutationError(
-        error instanceof Error ? error.message : 'Task gagal disimpan. Coba lagi.',
+        error instanceof Error ? error.message : 'Tugas gagal disimpan. Coba lagi.',
       )
       throw error
     }
   }
 
   if (data.loading) {
-    return <LoadingState label="Memuat task…" />
+    return <LoadingState label="Memuat tugas…" />
   }
   if (data.error) {
     return <ErrorState message={data.error} onRetry={() => void data.reload()} />
@@ -107,10 +107,10 @@ export function TasksPage({
           <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
           <p className="mt-2 text-sm text-slate-600">
             {mode === 'overdue'
-              ? 'Task belum selesai dengan deadline sebelum hari ini di Asia/Jakarta.'
+              ? 'Tugas yang belum selesai dengan tenggat sebelum hari ini di Asia/Jakarta.'
               : mode === 'completed'
-                ? 'Riwayat task yang sudah diselesaikan.'
-                : `${visibleTasks.length} task ditampilkan.`}
+                      ? 'Riwayat tugas yang sudah diselesaikan.'
+                      : `${visibleTasks.length} tugas ditampilkan.`}
           </p>
         </div>
         {mode === 'all' && (
@@ -119,7 +119,7 @@ export function TasksPage({
             className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             <Plus aria-hidden="true" className="size-4" />
-            Buat task
+            Buat tugas
           </Link>
         )}
       </header>
@@ -152,17 +152,17 @@ export function TasksPage({
         <EmptyState
           title={
             mode === 'overdue'
-              ? 'Tidak ada task overdue'
+              ? 'Tidak ada tugas terlambat'
               : mode === 'completed'
-                ? 'Belum ada task selesai'
-                : 'Belum ada task'
+                ? 'Belum ada tugas selesai'
+                : 'Belum ada tugas'
           }
           description={
             mode === 'overdue'
-              ? 'Task dengan deadline yang sudah lewat akan muncul di sini.'
+              ? 'Tugas yang tenggatnya sudah lewat akan muncul di sini.'
               : mode === 'completed'
-                ? 'Task yang Anda tandai selesai akan tersimpan di sini.'
-                : 'Tambahkan task pertama Anda untuk mulai mengatur pekerjaan.'
+                ? 'Tugas yang Anda tandai selesai akan tersimpan di sini.'
+                : 'Tambahkan tugas pertama Anda untuk mulai mengatur pekerjaan.'
           }
           action={
             mode === 'all' ? (
@@ -171,7 +171,7 @@ export function TasksPage({
                 className="inline-flex h-8 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700"
               >
                 <Plus aria-hidden="true" className="size-4" />
-                Buat task
+                Buat tugas
               </Link>
             ) : undefined
           }
@@ -189,7 +189,7 @@ export function TasksPage({
       )}
       {!isNew && taskId && !task && !data.error && (
         <Button variant="outline" onClick={() => navigate('/tasks')}>
-          Kembali ke task
+          Kembali ke daftar tugas
         </Button>
       )}
     </div>

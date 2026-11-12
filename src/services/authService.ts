@@ -1,5 +1,5 @@
 import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { setRememberSession, supabase } from '../lib/supabase'
 
 function getSupabase() {
   if (!supabase) {
@@ -35,8 +35,11 @@ export async function registerWithEmail(
 export async function signInWithEmail(
   email: string,
   password: string,
+  rememberSession = true,
 ): Promise<{ user: User; session: Session }> {
-  const { data, error } = await getSupabase().auth.signInWithPassword({
+  const client = getSupabase()
+  setRememberSession(rememberSession)
+  const { data, error } = await client.auth.signInWithPassword({
     email,
     password,
   })
