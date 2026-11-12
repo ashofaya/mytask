@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CalendarPlus, Pencil, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { formatDateJakarta } from '../../utils/dateTime'
-import { buildGoogleCalendarEventUrl } from '../../utils/googleCalendar'
+import { buildGoogleCalendarEventUrl, parseReminderToUtcDate } from '../../utils/googleCalendar'
 import { TASK_STATUSES, type Category, type TaskRecord, type TaskStatus } from '../../types/database'
 import { Button } from '../ui/button'
 import { getTaskPriorityLabel, getTaskStatusLabel } from '../../utils/taskLabels'
@@ -91,6 +91,21 @@ export function TaskList({
                   {task.deadline && (
                     <span>Tenggat {formatDateJakarta(task.deadline)}</span>
                   )}
+                  {(() => {
+                    const reminderDate = parseReminderToUtcDate(task.remind_at)
+                    return reminderDate ? (
+                      <span>
+                        Pengingat{' '}
+                        {formatDateJakarta(reminderDate.toISOString(), {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}{' '}
+                        WIB
+                      </span>
+                    ) : null
+                  })()}
                   {task.category_id && (
                     <span>Kategori: {categoryNames.get(task.category_id) ?? 'Kategori'}</span>
                   )}

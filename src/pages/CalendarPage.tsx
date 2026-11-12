@@ -57,7 +57,10 @@ export function CalendarPage() {
     [data.categories],
   )
   const exportableTasks = useMemo(
-    () => data.tasks.filter((task) => Boolean(task.deadline || task.start_date)),
+    () =>
+      data.tasks.filter((task) =>
+        Boolean(task.deadline || task.start_date || task.remind_at),
+      ),
     [data.tasks],
   )
 
