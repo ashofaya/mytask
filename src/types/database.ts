@@ -12,11 +12,20 @@ export const RECURRING_FREQUENCIES = [
 ] as const
 export type RecurringFrequency = (typeof RECURRING_FREQUENCIES)[number]
 
+export const VAULT_CATEGORIES = [
+  'Pribadi',
+  'Kerja',
+  'Dev/Cloud',
+  'Keuangan',
+] as const
+export type VaultCategory = (typeof VAULT_CATEGORIES)[number]
+
 export interface Profile {
   id: string
   display_name: string
   timezone: string
   notifications_enabled: boolean
+  vault_pin_hash?: string | null
   created_at: string
   updated_at: string
 }
@@ -92,8 +101,28 @@ export type TaskInsert = Pick<TaskRecord, 'title'> &
 export type TaskUpdate = Partial<TaskInsert>
 
 export type ProfileUpdate = Partial<
-  Pick<Profile, 'display_name' | 'notifications_enabled'>
+  Pick<Profile, 'display_name' | 'notifications_enabled' | 'vault_pin_hash'>
 >
+
+export interface VaultNote {
+  id: string
+  user_id: string
+  service_name: string
+  category: VaultCategory
+  email_or_username: string
+  encrypted_password: string
+  extra_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type VaultNoteInsert = Pick<
+  VaultNote,
+  'service_name' | 'category' | 'email_or_username' | 'encrypted_password'
+> &
+  Partial<Pick<VaultNote, 'extra_notes'>>
+
+export type VaultNoteUpdate = Partial<VaultNoteInsert>
 
 export type CategoryInsert = Pick<Category, 'user_id' | 'name'>
 export type CategoryUpdate = Partial<Pick<Category, 'name'>>

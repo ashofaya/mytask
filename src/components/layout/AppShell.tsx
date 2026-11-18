@@ -6,6 +6,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   ListTodo,
+  Lock,
   LogOut,
   Menu,
   Repeat2,
@@ -30,6 +31,7 @@ const navigation = [
   { to: '/calendar', label: 'Kalender', icon: CalendarDays },
   { to: '/categories', label: 'Kategori', icon: FolderKanban },
   { to: '/recurring', label: 'Tugas berulang', icon: Repeat2 },
+  { to: '/notes', label: 'Catatan', icon: Lock },
   { to: '/settings', label: 'Pengaturan', icon: Settings },
 ]
 

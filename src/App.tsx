@@ -48,6 +48,11 @@ const RecurringPage = lazy(() =>
     default: module.RecurringPage,
   })),
 )
+const NotesPage = lazy(() =>
+  import('./pages/NotesPage').then((module) => ({
+    default: module.NotesPage,
+  })),
+)
 const SettingsPage = lazy(() =>
   import('./pages/SettingsPage').then((module) => ({
     default: module.SettingsPage,
@@ -100,6 +105,8 @@ function App() {
               <Route path="calendar" element={<CalendarPage />} />
               <Route path="categories" element={<CategoriesPage />} />
               <Route path="recurring" element={<RecurringPage />} />
+              <Route path="notes" element={<NotesPage />} />
+              <Route path="vault" element={<Navigate to="/notes" replace />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>

@@ -7,6 +7,7 @@ export interface UserProfile {
   display_name: string
   timezone: string
   notifications_enabled: boolean
+  vault_pin_hash?: string | null
 }
 
 export async function getUserProfile(user: User): Promise<UserProfile> {
@@ -16,7 +17,7 @@ export async function getUserProfile(user: User): Promise<UserProfile> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, display_name, timezone, notifications_enabled')
+    .select('id, display_name, timezone, notifications_enabled, vault_pin_hash')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -43,7 +44,7 @@ export async function updateUserProfile(
     .from('profiles')
     .update(input)
     .eq('id', user.id)
-    .select('id, display_name, timezone, notifications_enabled')
+    .select('id, display_name, timezone, notifications_enabled, vault_pin_hash')
     .maybeSingle()
 
   if (error) {
